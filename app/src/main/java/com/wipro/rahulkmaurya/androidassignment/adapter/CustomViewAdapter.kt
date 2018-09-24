@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.jakewharton.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import com.wipro.rahulkmaurya.androidassignment.R
 import com.wipro.rahulkmaurya.androidassignment.model.Fact
@@ -18,8 +17,7 @@ import kotlinx.android.synthetic.main.custom_row.view.*
  *
  * Created by rahul.k.maurya on 2018-09-24.
  */
-class CustomViewAdapter(private var facts: MutableList<Fact>) :
-        RecyclerView.Adapter<CustomViewAdapter.ViewHolder>() {
+class CustomViewAdapter(private var facts: MutableList<Fact>) : RecyclerView.Adapter<CustomViewAdapter.ViewHolder>() {
     var context: Context? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,12 +32,13 @@ class CustomViewAdapter(private var facts: MutableList<Fact>) :
         holder.title.text = fact.title
         holder.description.text = fact.description
         holder.image.setImageResource(0)
-        val builder = Picasso.Builder(context)
-        builder.downloader(OkHttp3Downloader(context))
-        if (fact.imageHref != null)
-            builder.build().load(fact.imageHref.toString())
+
+
+        Picasso.Builder(context).build().load(fact.imageHref.toString())
                     .placeholder(R.drawable.ic_launcher_background)
                     .error(R.drawable.ic_launcher_background)
+                    .priority(Picasso.Priority.HIGH)
+                    .noFade()
                     .into(holder.image)
 
         with(holder.itemView) {

@@ -46,11 +46,15 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     private fun initProgressBar() {
         progressBar?.isIndeterminate = true
         val params = RelativeLayout.LayoutParams(Resources.getSystem().displayMetrics.widthPixels,
-                600)
-        params.addRule(RelativeLayout.CENTER_IN_PARENT)
+                250)
+        params.addRule(RelativeLayout.CENTER_VERTICAL )
+        params.alignWithParent = true
         this.addContentView(progressBar, params)
     }
 
+    /**
+     * This method will make an api call for list of facts.
+     * */
     private fun loadFacts() {
         val call = getFactsServicesClient().listOfFacts()
         // Execute the call asynchronously.
@@ -66,20 +70,30 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
             }
         })
     }
-
+    /**
+     * This method get called from presentation layer after performing business logic to update UI.
+     * */
     override fun updateFactsView(facts: Facts?) {
         generateDataList(facts)
     }
 
+    /**
+     * For showing progress bar
+     * */
     override fun showProgressBar() {
         progressBar?.visibility = View.VISIBLE
     }
 
+    /**
+     * For hiding progress bar
+     * */
     override fun hideProgressBar() {
         progressBar?.visibility = View.INVISIBLE
     }
 
-    /*Method to generate List of data using RecyclerView with custom adapter*/
+    /**
+     * This method will initialize Recycler view and custom adapter to inflate fact data.
+     * */
     private fun generateDataList(facts: Facts?) {
         val recyclerView: RecyclerView = findViewById(R.id.customRecyclerView)
         val adapter = CustomViewAdapter(facts!!.rows!!)

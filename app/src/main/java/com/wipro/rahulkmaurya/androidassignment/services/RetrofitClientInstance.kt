@@ -9,9 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  * Created by rahul.k.maurya on 2018-09-24.
  */
 object RetrofitClientInstance {
-
-    private var retrofit: Retrofit? = null
-    private var BASE_URL: String = "https://dl.dropboxusercontent.com";
+    private var BASE_URL: String = "https://dl.dropboxusercontent.com"
 
     fun getFactsServicesClient() : FactsServices {
         val retrofit = Retrofit.Builder()
@@ -19,6 +17,6 @@ object RetrofitClientInstance {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
-        return retrofit.create<FactsServices>(FactsServices::class.java)
+        return retrofit.create(FactsServices::class.java)
     }
 }
