@@ -29,7 +29,6 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     private var presenter: ActivityPresenter? = null
     private var progressBar: ProgressBar? = null
-    private val swipeContainer : SwipeRefreshLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,18 +63,19 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
      * */
     private fun loadFacts() {
         val call = getFactsServicesClient().listOfFacts()
+        val swipeContainer : SwipeRefreshLayout = findViewById(R.id.swipeContainer)
         // Execute the call asynchronously.
         call.enqueue(object : Callback<Facts> {
             override fun onResponse(call: Call<Facts>, response: Response<Facts>) {
                 presenter?.updateFactsData(response.body())
                 hideProgressBar()
-                swipeContainer?.isRefreshing = false
+                swipeContainer.isRefreshing = false
             }
 
             override fun onFailure(call: Call<Facts>, t: Throwable) {
                 hideProgressBar()
                 presenter?.updateFactsData(null)
-                swipeContainer?.isRefreshing = false
+                swipeContainer.isRefreshing = false
                 Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         })
@@ -107,17 +107,23 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     private fun generateDataList(facts: Facts?) {
         val recyclerView: RecyclerView = findViewById(R.id.customRecyclerView)
         val dataNotAvailable: TextView = findViewById(R.id.dataNotAvailable)
-        if(facts != null) {
-            dataNotAvailable.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
-            val adapter = CustomViewAdapter(facts.rows!!)
-            val layoutManager = LinearLayoutManager(this)
-            recyclerView.layoutManager = layoutManager
-            recyclerView.adapter = adapter
-            adapter.notifyDataSetChanged()
-        } else {
-            dataNotAvailable.visibility = View.VISIBLE
-            recyclerView.visibility = View.GONE
+        supportActionBar?.title = facts?.title
+        val adapter = CustomViewAdapter(facts?.rows!!)
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+        // Controling visibility of recycler view & dataNotAvailable views.
+        when (facts != null) {
+            true -> {
+                dataNotAvailable.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+            }
+            false -> {
+                dataNotAvailable.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            }
         }
     }
 
