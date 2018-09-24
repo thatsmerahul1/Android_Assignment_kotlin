@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.wipro.rahulkmaurya.androidassignment.R
 import com.wipro.rahulkmaurya.androidassignment.adapter.CustomViewAdapter
@@ -31,8 +32,6 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleSmall)
         presenter = ActivityPresenter(this)
 
         initProgressBar()
@@ -44,12 +43,11 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
      * This method will initialize progress bar
      * */
     private fun initProgressBar() {
-        progressBar?.isIndeterminate = true
-        val params = RelativeLayout.LayoutParams(Resources.getSystem().displayMetrics.widthPixels,
-                250)
+        progressBar = findViewById(R.id.progressBar)
+        val params = RelativeLayout.LayoutParams(Resources.getSystem().displayMetrics.widthPixels,250)
         params.addRule(RelativeLayout.CENTER_VERTICAL )
         params.alignWithParent = true
-        this.addContentView(progressBar, params)
+        progressBar?.layoutParams = params
     }
 
     /**
@@ -66,6 +64,7 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
 
             override fun onFailure(call: Call<Facts>, t: Throwable) {
                 hideProgressBar()
+                presenter?.updateFactsData(null)
                 Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         })
@@ -96,11 +95,19 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
      * */
     private fun generateDataList(facts: Facts?) {
         val recyclerView: RecyclerView = findViewById(R.id.customRecyclerView)
-        val adapter = CustomViewAdapter(facts!!.rows!!)
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = adapter
-        adapter.notifyDataSetChanged()
+        val dataNotAvailable: TextView = findViewById(R.id.dataNotAvailable)
+        if(facts != null) {
+            dataNotAvailable.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            val adapter = CustomViewAdapter(facts.rows!!)
+            val layoutManager = LinearLayoutManager(this)
+            recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = adapter
+            adapter.notifyDataSetChanged()
+        } else {
+            dataNotAvailable.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+        }
     }
 
 }
