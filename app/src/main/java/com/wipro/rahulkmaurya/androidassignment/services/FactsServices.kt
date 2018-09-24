@@ -5,7 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 /**
- * Class used to <insert description here>
+ * Class used for conatining list of all the fact services.
  *
  * Created by rahul.k.maurya on 2018-09-24.
  */
