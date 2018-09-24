@@ -2,6 +2,7 @@ package com.wipro.rahulkmaurya.androidassignment.view
 
 import android.content.res.Resources
 import android.os.Bundle
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -28,11 +29,19 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     private var presenter: ActivityPresenter? = null
     private var progressBar: ProgressBar? = null
+    private val swipeContainer : SwipeRefreshLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         presenter = ActivityPresenter(this)
+
+        val swipeContainer : SwipeRefreshLayout = findViewById(R.id.swipeContainer)
+
+        // Setup refresh listener which  will triggers load facts
+        swipeContainer.setOnRefreshListener({
+            loadFacts()
+        })
 
         initProgressBar()
         showProgressBar()
@@ -60,11 +69,13 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
             override fun onResponse(call: Call<Facts>, response: Response<Facts>) {
                 presenter?.updateFactsData(response.body())
                 hideProgressBar()
+                swipeContainer?.isRefreshing = false
             }
 
             override fun onFailure(call: Call<Facts>, t: Throwable) {
                 hideProgressBar()
                 presenter?.updateFactsData(null)
+                swipeContainer?.isRefreshing = false
                 Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
         })
