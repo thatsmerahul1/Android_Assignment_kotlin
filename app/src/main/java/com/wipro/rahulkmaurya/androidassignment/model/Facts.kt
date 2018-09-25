@@ -20,7 +20,7 @@ data class Facts(val title : String?, val rows : MutableList<Fact>?) {
         val call = RetrofitClientInstance.getFactsServicesClient().listOfFacts()
         call.enqueue(object : Callback<Facts> {
             override fun onResponse(call: Call<Facts>, response: Response<Facts>) {
-                factsServiceListener.onDataReceived(response?.body())
+                factsServiceListener.onDataReceived(response.body())
             }
             override fun onFailure(call: Call<Facts>, t: Throwable) {
                 factsServiceListener.onDataReceived(null)
