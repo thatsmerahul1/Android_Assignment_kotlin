@@ -14,9 +14,9 @@ import android.widget.Toast;
 public class NetworkConnectivityListener extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        int status = NetworkUtil.getConnectivityStatusString(context);
-        if ("android.net.conn.CONNECTIVITY_CHANGE".equals(intent.getAction())) {
-            Toast.makeText(context, status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED ? "Please check your internet connection." : "Bravo! You came online.", Toast.LENGTH_SHORT).show();
+        if ("android.net.conn.CONNECTIVITY_CHANGE" == intent.getAction()
+                && NetworkUtil.getConnectivityStatusString(context)  == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+            Toast.makeText(context, "Please check your internet connection.", Toast.LENGTH_SHORT).show();
         }
     }
 }

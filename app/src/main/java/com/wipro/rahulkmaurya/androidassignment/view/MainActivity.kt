@@ -1,6 +1,8 @@
 package com.wipro.rahulkmaurya.androidassignment.view
 
+import android.content.IntentFilter
 import android.content.res.Resources
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AppCompatActivity
@@ -15,7 +17,9 @@ import com.wipro.rahulkmaurya.androidassignment.R
 import com.wipro.rahulkmaurya.androidassignment.adapter.CustomViewAdapter
 import com.wipro.rahulkmaurya.androidassignment.model.Facts
 import com.wipro.rahulkmaurya.androidassignment.presenter.ActivityPresenter
+import com.wipro.rahulkmaurya.androidassignment.utils.NetworkConnectivityListener
 import com.wipro.rahulkmaurya.androidassignment.utils.NetworkUtil
+
 
 /**
  * Class used to handle main activity view
@@ -107,4 +111,22 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
         }
     }
 
+    /**
+     * Registering Net
+     * */
+    private val networkChangeReceiver: NetworkConnectivityListener = NetworkConnectivityListener()
+
+    override fun onResume() {
+        super.onResume()
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, intentFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        unregisterReceiver(networkChangeReceiver)
+    }
 }
