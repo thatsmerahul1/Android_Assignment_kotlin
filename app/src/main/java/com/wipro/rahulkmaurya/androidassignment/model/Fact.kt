@@ -1,7 +1,7 @@
 package com.wipro.rahulkmaurya.androidassignment.model
 
 /**
- * Class used to <consume list of Facts and it is used as a model>
+ * Class used to consume list of Facts and it is used as a model
  *
  * Created by rahul.k.maurya on 2018-09-24.
  */

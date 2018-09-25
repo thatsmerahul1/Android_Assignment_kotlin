@@ -15,10 +15,7 @@ import com.wipro.rahulkmaurya.androidassignment.R
 import com.wipro.rahulkmaurya.androidassignment.adapter.CustomViewAdapter
 import com.wipro.rahulkmaurya.androidassignment.model.Facts
 import com.wipro.rahulkmaurya.androidassignment.presenter.ActivityPresenter
-import com.wipro.rahulkmaurya.androidassignment.services.RetrofitClientInstance.getFactsServicesClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.wipro.rahulkmaurya.androidassignment.utils.NetworkUtil
 
 /**
  * Class used to handle main activity view
@@ -33,18 +30,20 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter = ActivityPresenter(this)
-
         val swipeContainer : SwipeRefreshLayout = findViewById(R.id.swipeContainer)
+        initProgressBar()
+        showProgressBar()
+        presenter = ActivityPresenter(this)
 
         // Setup refresh listener which  will triggers load facts
         swipeContainer.setOnRefreshListener({
-            loadFacts()
+            if(NetworkUtil.getConnectivityStatus(applicationContext) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                swipeContainer.isRefreshing = false
+                Toast.makeText(applicationContext, "Please check your internet connection.", Toast.LENGTH_SHORT).show()
+            } else {
+                presenter?.pullToRefreshCalled()
+            }
         })
-
-        initProgressBar()
-        showProgressBar()
-        loadFacts()
     }
 
     /**
@@ -59,31 +58,12 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     }
 
     /**
-     * This method will make an api call for list of facts.
-     * */
-    private fun loadFacts() {
-        val call = getFactsServicesClient().listOfFacts()
-        val swipeContainer : SwipeRefreshLayout = findViewById(R.id.swipeContainer)
-        // Execute the call asynchronously.
-        call.enqueue(object : Callback<Facts> {
-            override fun onResponse(call: Call<Facts>, response: Response<Facts>) {
-                presenter?.updateFactsData(response.body())
-                hideProgressBar()
-                swipeContainer.isRefreshing = false
-            }
-
-            override fun onFailure(call: Call<Facts>, t: Throwable) {
-                hideProgressBar()
-                presenter?.updateFactsData(null)
-                swipeContainer.isRefreshing = false
-                Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-    /**
      * This method get called from presentation layer after performing business logic to update UI.
      * */
     override fun updateFactsView(facts: Facts?) {
+        val swipeContainer : SwipeRefreshLayout = findViewById(R.id.swipeContainer)
+        swipeContainer.isRefreshing = false
+        hideProgressBar()
         generateDataList(facts)
     }
 
@@ -107,18 +87,18 @@ class MainActivity : AppCompatActivity(), ActivityPresenter.View {
     private fun generateDataList(facts: Facts?) {
         val recyclerView: RecyclerView = findViewById(R.id.customRecyclerView)
         val dataNotAvailable: TextView = findViewById(R.id.dataNotAvailable)
-        supportActionBar?.title = facts?.title
-        val adapter = CustomViewAdapter(facts?.rows!!)
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = adapter
-        adapter.notifyDataSetChanged()
 
         // Controling visibility of recycler view & dataNotAvailable views.
         when (facts != null) {
             true -> {
                 dataNotAvailable.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
+                supportActionBar?.title = facts?.title
+                val adapter = CustomViewAdapter(facts?.rows!!)
+                val layoutManager = LinearLayoutManager(this)
+                recyclerView.layoutManager = layoutManager
+                recyclerView.adapter = adapter
+                adapter.notifyDataSetChanged()
             }
             false -> {
                 dataNotAvailable.visibility = View.VISIBLE

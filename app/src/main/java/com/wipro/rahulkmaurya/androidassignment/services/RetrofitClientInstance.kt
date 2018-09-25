@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 /**
- * Class used to <give retrofit client and all available services in project>
+ * Class used to give retrofit client and all available services in project
  *
  * Created by rahul.k.maurya on 2018-09-24.
  */
